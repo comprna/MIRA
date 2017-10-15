@@ -17,3 +17,10 @@ Pipeline:
   
   - Take the regulated SMRs (\*.clust) files, create control sequences and performs kmer enrichment
   - label kmers with Deepbind, through deepbind analysis.
+
+
+Results:
+
+Results from MIRA on 505 WGS samples from TCGA and associated RNA-seq samples are available here
+http://comprna.upf.edu/Data/MutationsRBPMotifs/INTRON/SNRNP70/
+https://www.biorxiv.org/content/early/2017/10/09/200188
