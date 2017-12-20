@@ -7,12 +7,12 @@ Command to run MIRA directly:
 ## A. Overlap mutation (MAF) file with Gene cordinates 
 
 *Command to overlap gene file with MAF file
+
+```
 #1. Use fjoin.py to combine both files
-```
 python MIRA/fjoin.py -s both -1 $input_mutation_File -2 $input_annotation_File --columns1=1,2,3 --columns2=1,2,3 >"$input_mutfile.tmp"
-```
+
 #2. remove first column returned by fjoin
-````
 cat "$input_mutfile.tmp" | awk 'BEGIN{FS=OFS="\t"}{$1="";sub("\t","")}1' >"$input_mutfile.mut.out"
 rm $input_mutfile.tmp
 ````
