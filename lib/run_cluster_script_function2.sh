@@ -4,8 +4,10 @@
 #$ -V
 #$ -q long,bigmem,normal
 
+## This script is to run on cluster.
+### Divide the chunk of genes into 100-200 list and run the process of mutation counting on kmers 
 
-#Usage: qsub script/run_mutation_pipeline.sh
+#Usage: qsub script/run_mutation_pipeline.sh  #for gencluster
 
 #bed_line is bedfile coordinates for each gene.
 
@@ -13,29 +15,29 @@
 
 export PATH=/soft/devel/python-2.7/bin/python:$PATH
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/soft/lib
-export PATH=/data/users/babita/.bashrc:$PATH
+export PATH=/.bashrc:$PATH
 export PATH=/soft/devel/perl-5.16.3/bin/:$PATH
 
 #export PATH=/soft/devel/python-2.7/lib/python2.7/site-packages/pybedtools-0.6.2-py2.7-linux-x86_64.egg/pybedtools/:$PATH
 
-kmer_len=7 #change length of kmers
-mut_count=3  #change minimum mutation required
-ref_genome="/projects_rg/babita/ref_genome/hg19.fa"
+kmer_len=7 	#change length of kmers
+mut_count=3  	#change minimum mutation required
+ref_genome="./ref_genome/hg19.fa"
 
-main_dir="/projects_rg/babita/TCGA/mutation/mut_pipeline/subs"
-out_dir="/projects_rg/babita/TCGA/mutation/mut_pipeline/subs/subs_new/test_7mers"
-source_files="$main_dir/src_files"
+main_dir="./"
+out_dir="./test_7mers"
+refpath="MIRA/ref_files"  
 
-mutation_bed="$source_files/mutations_tcga_substitution_formatted.tsv"
-annotation_bed="$source_files/gencode.v19.annotation.gtf.clean.GENE.bed.clustered.new"
+mutation_bed="$refpath/mutations_tcga_substitution_formatted.tsv"   #add mutation file *.tsv in ref_files (Not provided in repository)
+annotation_bed="$refpath/gencode.v19.annotation.gtf.clean.GENE.bed.clustered.new"
 
-all_gene_overlap_mutfile="$mutation_bed.mut.out"
+all_gene_overlap_mutfile="$mutation_bed.mut.out"   #path with 'fjoined' mutation file obtained from function 1
 gene_lib_dir="$out_dir/outdir"
 
 
 mkdir $gene_lib_dir
 
-script_path="/projects_rg/babita/TCGA/mutation/mut_pipeline/scripts"
+script_path="MIRA/lib"
 
 
 echo "shell start"
@@ -45,7 +47,7 @@ LINES_ANNOT=$(wc -l < $annotation_bed)
 
 cnt=0
 
-for ((i=0; i<=LINES_ANNOT; i+=100));
+for ((i=0; i<=LINES_ANNOT; i+=100)); #no. of gene chunks to be cut from main annotation file. Here, run 100 genes at a time.
 
 do
 
@@ -53,9 +55,9 @@ do
     ii=$((i+1))
     j=$((i+100))
 
+    #subset_gene_file="genes_$j"  into 100 gene chunks (change to whatever number instead of 100)
+    
     cat $annotation_bed | sed -n "$ii","$j"p >genes_"$j".bed
-
-    #subset_gene_file="genes_$j"
 
     cnt=$((cnt+1))
     #Run for each job in clusters for 100 genes 
@@ -66,8 +68,7 @@ do
     #source ~/.bashrc
     export PATH=/soft/devel/python-2.7/lib/python2.7/site-packages/pybedtools-0.6.2-py2.7-linux-x86_64.egg/pybedtools/:$PATH
  
-    qsub -N job_"$cnt" -b y -cwd -V -q long $job
- 
+    qsub -N job_"$cnt" -b y -cwd -V -q long $job  #submit jobs to cluster
  
 
     echo "Done gene_$j.bed"     
