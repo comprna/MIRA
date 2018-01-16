@@ -2,24 +2,24 @@
 
 #Prerequisite:
 #	- *.clust files (SMR files, ie mutated kmers clustered together to create SMRs)
-#	- reference file with 5SS/3SS/stop/start cordinates for all genes (to select controls)
+#	- reference file with 5SS/3SS cordinates for all genes (to select controls) provided in ref_files
 
 
-#paths fixed
+#Define paths 
 bedtoolspath="/soft/bio/sequence/bedtools-2.25.0/bin"
-scriptpath="/projects_rg/babita/TCGA/mutation/mut_pipeline/scripts"
+scriptpath="MIRA/lib"
 pythonpath="/soft/devel/python-2.7/bin"
-refpath="/projects_rg/babita/ref_genome/no_pseudogenes"
-fastafile="/projects_rg/babita/ref_genome/hg19.fa"
+refpath="MIRA/ref_files"
+fastafile="ref_genome/hg19.fa"   
 RscriptPath="/soft/R/R-3.2.3/bin"
-motif_filtered_db="/projects_rg/babita/TCGA/mutation/motif_filtered_db"
-deepbindpath="~/soft/deepbind"
+motif_filtered_db="MIRA/ref_files/motif_db/"
+deepbindpath="MIRA/deepbind"  #another tool
 
 
 # Paths to replace
-smr_dir="/projects_rg/babita/TCGA/mutation/mut_pipeline/subs/subs_new/main_tables"
-ref_dir="/projects_rg/babita/ref_genome/no_pseudogenes/"  
-mutation_file="$smr_dir/tcga_all_genes_mutations_7mer.tab.filtered"
+smr_dir="MIRA/test/main_tables"
+ref_dir="MIRA/ref_files"  
+mutation_file="$smr_dir/tcga_all_genes_mutations_7mer.tab.filtered"  #filename extention
 
 #####functions ###
 
