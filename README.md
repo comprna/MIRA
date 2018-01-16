@@ -3,6 +3,10 @@ Mutation identification for RNA alterations
 
 MIRA is a pipeline to identify mutational patterns related to RNA processing in human tumors. MIRA performs unbiased search for significantly mutated regions (SMRs) along gene loci through dividing sequence into short kmer windows of length n (default: 7). The method of calculation is based on binomial test and further corrected for local nucleotide biases. Later, the significant kmers thus obtained are overlapped with genic regions and motif enrichment test is performed for siginificant kmers enriched with mutations. These kmers and then labeled using annotation tool like Deepbind and downstream analysis of functional impact is performed.
 
+
+### Please run script 'lib/run_pipeline_MIRA.sh' to run the pipeline.
+
+
 Command to run MIRA directly:
 ## A. Overlap mutation (MAF) file with Gene cordinates 
 
@@ -19,14 +23,18 @@ rm $input_mutfile.tmp
 
 ## B. Run MIRA mutation analysis command:
 
-Prerequisites:
-1. Kmer_length: length of the kmer regions to scan. (Integer, usually between 5-8)
-2. ref_genome: Reference genome file (eg. hg19.fa)
-3. all_gene_overlap_mutfile: MAF or mutation cordinates overlapped with gene cordinates* (see command below to generate such file).
-4. gene_lib_dir: An output directory where all files will be created.
-5. gene_annotation.bed: Gene annotation file in bed format (used to create file 3 above).
+Input parameters:   <length_kmer> <threshold-mut_count> <ref_genome_fasta_file(hg19.fa)> <file *.mut.out> <output_dir> <gene_annotation_file> <bedtools_path> <perl_path>
+1. <Kmer_length>: Length of the kmer regions to scan. (Integer, usually between 5-8)
+2. <threshold-mut_count>: Minimum mutation count on the kmers (Integer, usually 3 or more)
+3. <Ref_genome>: Reference genome file (file path, eg. hg19.fa)
+4. <mut_gene_overlap_mutfile>: MAF or mutation cordinates overlapped with gene cordinates* (file path, see command below to generate such file).
+5. <output_gene_lib_dir>: An output directory where all files will be created. (file path)
+6. <ggene_annotation_file>: Gene annotation file in bed format (file path, used to create file 3 above, provided in ref_files/)
+7. <bedtools_path> : Path to bedtools (path, eg. /bedtools/bin) 
+8. <perl_path> : Path to Perl dir (path, eg. /perl/bin)
+
 ```
-python MIRA/run_count_mutation_analysis.py <$kmer_length> <$ref_genome> <$all_gene_overlap_mutfile> <$gene_lib_dir> <gene_annotation.bed>
+python MIRA/run_count_mutation_analysis.py <$length_kmer> <$threshold-mut_count> <$ref_genome_fasta_file> <$mut_gene_overlap_mutfile> <$output_gene_lib_dir> <$gene_annotation_file> <$bedtools_path> <$perl_path>
 ```
 
 ## C. Create clusters of sigificantly mutated regions:
