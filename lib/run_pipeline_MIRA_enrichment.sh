@@ -13,7 +13,9 @@ refpath="MIRA/ref_files"
 fastafile="ref_genome/hg19.fa"   
 RscriptPath="/soft/R/R-3.2.3/bin"
 motif_filtered_db="MIRA/ref_files/motif_db/"
-deepbindpath="MIRA/deepbind"  #another tool
+deepbindpath="MIRA/deepbind"  #Important: Please download deepbind seperately. The folder provided in this repository is for test purposes, 
+			      ## it doesn't include all motifs in db/params/ folder. 
+			      ### Deepbind Link: http://tools.genes.toronto.edu/deepbind/
 
 
 # Paths to replace
