@@ -1,29 +1,31 @@
 ##Define Filepaths
-bedtoolspath="/soft/bio/sequence/bedtools-2.25.0/bin"
-pythonpath="/soft/devel/python-2.7/bin"
-perlpath="/soft/devel/perl-5.16.3/bin"
-rscriptpath="/soft/R/R-3.0.0/bin"
+bedtoolspath="/bedtools-2.25.0/bin"
+pythonpath="/python-2.7/bin"
+perlpath="/perl-5.16.3/bin"
+rscriptpath="/R/R-3.0.0/bin"
 
-scriptpath="/home/babita/Desktop/MIRA/lib"
-refpath="/home/babita/Desktop/MIRA/ref_files"
-ref_genome="/home/babita/ref_genome/hg19.fa" #human genome fasta file (hg19.fa)
+scriptpath="MIRA/lib"
+refpath="MIRA/ref_files"
 
-kmer_len=7
-main_outdir="/home/babita/Desktop/MIRA/test$kmer_len"
+ref_genome="~/ref_genome/hg19.fa" # Define path for human genome fasta file (hg19.fa) not provided in MIRA. 
+
+kmer_len=7  #Define length of the k-mers
+main_outdir="./test$kmer_len"  #Define path for outputs
+
+mutation_bed="$refpath/mutations_tcga_substitution_formatted.tsv"  #Not provided in MIRA repository due to file size limit, please refer article
+annotation_bed="$refpath/GENE.gencode.v19.clustered.bed"   
+
+
 mkdir $main_outdir
 mutpath="$main_outdir/main_tables" 
 mkdir $mutpath
 
-main2_outdir="/projects_rg/babita/TCGA/mutation/mut_pipeline/subs/subs_new/test_"$kmer_len"mers"
-
-mutation_bed="$refpath/mutations_tcga_substitution_formatted.tsv"
-annotation_bed="$refpath/GENE.gencode.v19.clustered.bed"
-
+#Function calls are at the bottom of this script
 
 
 #Define Functions
 ######################################################################################################
-#1. create a common mutation file by overlapping gene annotation file and refernece mutation file
+#1. create a common mutation file by overlapping gene annotation file and reference mutation file (*.tsv)
 
 fun_fjoin_annotate_mut_file () {
 input_mutfile=$1
@@ -44,6 +46,9 @@ echo "Done function 1"
 
 #----------------------------#
 
+######################################################################################################
+#2. Run mutation counts on Kmers (This part is better run on clusters. refer 'run_cluster_script_function2.sh'
+    #Statistical test analysis of kmers.
 
 fun_count_mutation (){
 
@@ -62,9 +67,12 @@ $pythonpath/python $script_path/run_count_mutation_analysis.py $kmer_len $mut_co
 
 echo "Output files stored in ./outdir"
 }
+#----------------------------#
 
 
-##create main output file
+######################################################################################################
+#3. Create one main table from all gene outputs from function2 (only files with extension *.mut.out)
+
 fun_create_main_table () {
 
 #3. Function to read all mutaion files in outdir (generated through function 'fun_count_mutation') and create one single mutation file.
@@ -87,9 +95,13 @@ echo "Done function 2"
 
 #----------------------------#
 
-##create overlap of region files
+######################################################################################################
+#4. Hierarchical overlapping of the kmers with genomic regions such as UTRs/EXONs/INTRONs/CDS
+
 fun_create_overlaps () {
  mutation_file=$1
+
+##create overlap of region files
 
  echo $mutation_file
  echo "$refpath/5SS.gencode.v19.clustered.bed"
@@ -144,7 +156,11 @@ fun_create_overlaps () {
  rm $mutation_file*.rest
 }
 
+#----------------------------#
 
+
+######################################################################################################
+#5. Create clusters of k-mers ie. Significantly Mutated Regions (SMRs) with overlapped genic regions in function 4.
 
 fun_create_clusters () {
 ### create clusters of regions
@@ -162,6 +178,8 @@ fun_create_clusters () {
 }
 
 
+######################################################################################################
+#6. Optional: To create control regions for enrichment analysis
 
 fun_create_controls () {
 #create control sets for each cluster of kmers for each regions (UTRs/Exons/Introns/CDSs)
@@ -176,8 +194,10 @@ fun_create_controls () {
 	
 }
 
+#----------------------------#
 
-
+######################################################################################################
+#7. Optional: Do enrichment analysis of the kmers
 fun_create_enrichment () {
 
 		reg=$1
@@ -196,6 +216,10 @@ fun_create_enrichment () {
 
 }
 
+#----------------------------#
+
+######################################################################################################
+#7. Optional: Do reverse enrichment analysis of the kmers to remove DNA biased kmers.
 
 fun_create_reverse_enrichment (){
 		#run scripts/reverse_complement_enrichment.py before the following:
@@ -224,20 +248,24 @@ fun_create_reverse_enrichment (){
 
 ######################################################################################################
 
+##################
+# Call Functions #
+##################
+
 #function 1: Create a reference mutation file by extracting mutations found in geneic regions
 #fun_fjoin_annotate_mut_file $mutation_bed $annotation_bed
 
 
-#function 2
-#Note: Before running this funtion it's better to extract the gene ids that overlapped with mutation file in function 1 -
- 	#through 'fjoin', convert it to bedfile format and run the following script for only the overlapping genes.
-#Note 2: Even better if the overlapping genes are divided into chunks of 100-200 genes and run parallel processes in the cluster.
+#function 2:
+#Note: Before running this funtion it's better to extract the gene ids that overlapped with mutation file using 'fjoin' in function 1 -
+ 	# in bedfile format and run following script for only the overlapping genes.
+#Note 2: Even better if the overlapping genes are divided into chunks of 100-200 genes and run parallel processes in the cluster. Please see script: run_cluster_script_function2.sh
 
 #fun_count_mutation 
 
 
 #function 3.
-mut_outdir="$main2_outdir/outdir"
+mut_outdir="$main_outdir/outdir"
 mutation_file1="tcga_all_genes_mutations_"$kmer_len"mer.tab" #change filename
 #fun_create_main_table "$mutpath/$mutation_file1" $mut_outdir
 
@@ -245,7 +273,6 @@ mutation_file1="tcga_all_genes_mutations_"$kmer_len"mer.tab" #change filename
 #function 4.
 mutation_file1="$mutpath/tcga_all_genes_mutations_"$kmer_len"mer.tab.filtered"
 #fun_create_overlaps "$mutation_file1"
-
 
 
 ##call functions per regions
@@ -257,8 +284,8 @@ for region in "${regions[@]}" ; do
 	echo "$region"
 	fun_create_clusters "$mutation_file1" $region
 	
-	#fun_create_controls $region
-	#fun_create_enrichment $region
+	#fun_create_controls $region  #optional
+	#fun_create_enrichment $region  #optional
 
 	
 	#run the script "reverse_complement_enrichment.py" before running following
@@ -266,7 +293,7 @@ for region in "${regions[@]}" ; do
 	#mutation_file1="tcga_all_genes_mutations_"$kmer_len"mer.tab.filtered"
 	
 	#mkdir $file_dir
-	#fun_create_reverse_enrichment $region $file_dir $mutation_file1
+	#fun_create_reverse_enrichment $region $file_dir $mutation_file1  #optional
 	
 done
 
