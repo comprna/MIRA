@@ -1,3 +1,6 @@
+![Mira1.jpg](https://user-images.githubusercontent.com/23315833/35625867-2fe09b2a-0694-11e8-98b5-a4c6c2caf483.png)
+
+
 # MIRA
 Mutation identification for RNA alterations
 
