@@ -77,5 +77,7 @@ Pipeline overview:
 Results:
 
 Results from MIRA on 505 WGS samples from TCGA and associated RNA-seq samples are available here
+
 http://comprna.upf.edu/Data/MutationsRBPMotifs/
+
 http://mcr.aacrjournals.org/content/early/2018/04/18/1541-7786.MCR-17-0601
