@@ -2,7 +2,7 @@
 
 
 # MIRA
-Mutation identification for RNA alterations
+Mutation Identification for RNA Alterations
 
 MIRA is a pipeline to identify mutational patterns related to RNA processing in human tumors. MIRA performs unbiased search for significantly mutated regions (SMRs) along gene loci through dividing sequence into short kmer windows of length n (default: 7). The method of calculation is based on binomial test and further corrected for local nucleotide biases. Later, the significant kmers thus obtained are overlapped with genic regions and motif enrichment test is performed for siginificant kmers enriched with mutations. These kmers and then labeled using annotation tool like Deepbind and downstream analysis of functional impact is performed.
 
